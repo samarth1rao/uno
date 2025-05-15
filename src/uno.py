@@ -7,7 +7,7 @@ def buildDeck():
     colours = ["Red", "Green", "Blue", "Yellow"]
     numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     actions = ["Skip", "Reverse", "Draw2"] * 2   
-    wilds = ["Wild", "Wild", "Wild", "Wild", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4"]
+    wilds = ["Wild", "Wild", "Wild", "Wild", "draw4", "draw4", "draw4", "draw4"]
     
     deck = []
     for colour in colours:
@@ -33,7 +33,7 @@ class UnoGame:
         self.currentPlayer = 0  
 
         self.direction = 1
-        self.drawPile = 0 # how many cards does the next user need to dr
+        self.drawPile = 0 # how many cards does the next user need to draw
         self.pendingDrawType = None # this can be either draw2 or draw4, depending on what was thrown onto the pile last
 
         for i in range(7):
