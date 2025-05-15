@@ -4,10 +4,10 @@ import random
 from pyfiglet import Figlet
 
 def buildDeck():
-    colours = ["red", "green", "blue", "yellow"]
+    colours = ["Red", "Green", "Blue", "Yellow"]
     numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    actions = ["Skip", "Reverse", "draw2"] * 2   
-    wilds = ["wild", "wild", "wild", "wild", "draw4", "draw4", "draw4", "draw4"]
+    actions = ["Skip", "Reverse", "Draw2"] * 2   
+    wilds = ["Wild", "Wild", "Wild", "Wild", "draw4", "draw4", "draw4", "draw4"]
     
     deck = []
     for colour in colours:
@@ -16,7 +16,7 @@ def buildDeck():
         for action in actions:
             deck.append((colour, action))
     for wild in wilds:
-        deck.append(("wild", wild))
+        deck.append(("Wild", wild))
     return deck
 
 class UnoGame:
@@ -42,7 +42,7 @@ class UnoGame:
 
         while True:
             openCard = self.deck.pop()
-            if openCard[1] not in ["wild", "draw4"]:  
+            if openCard[1] not in ["Wild", "draw4"]:  
                 self.discardPile.append(openCard)
                 self.currentColour = openCard[0]
                 break
@@ -66,7 +66,7 @@ class UnoGame:
     def isValid(self, card, player):
         vcolour = self.currentColour if self.currentColour else self.discardPile[-1][0]
         nColour, nNumber = card
-        return nColour == vcolour or nNumber == self.discardPile[-1][1] or nColour == "wild"
+        return nColour == vcolour or nNumber == self.discardPile[-1][1] or nColour == "Wild"
 
     def playCard(self, card, player, wildColour=None):
         if card not in self.players[player]:
@@ -82,26 +82,21 @@ class UnoGame:
             self.currentPlayer = (self.currentPlayer + self.direction) % len(self.players)
         elif card[1] == "Reverse":
             self.direction = -1 * self.direction
-        elif card[1] == "draw2":
-            print("Entering draw2 case")
+        elif card[1] == "Draw2":
             self.drawPile += 2
-            self.pendingDrawType = "draw2"
-            self.currentPlayer = (self.currentPlayer + self.direction) % len(self.players)
-            return True
+            self.pendingDrawType = "Draw2"
         elif card[1] == "draw4":
             self.drawPile += 4
-            self.pendingDrawType = "Draw4"
+            self.pendingDrawType = "Draw2"
             if wildColour:
                 self.currentColour = wildColour
-            self.currentPlayer = (self.currentPlayer + self.direction) % len(self.players)
-            return True
-        elif card[1] == "wild":
+        elif card[1] == "Wild":
             if wildColour:
                 self.currentColour = wildColour
         else:
             self.currentColour = None
 
-        if card[1] not in ["draw2", "draw4"] and card[1] != "Skip":
+        if card[1] not in ["Draw2", "draw4"] and card[1] != "Skip":
             self.currentPlayer = (self.currentPlayer + self.direction) % len(self.players)
         return True
 
@@ -114,44 +109,28 @@ class UnoCLI:
             players = list(self.game.players.keys())
             current_player = players[self.game.currentPlayer]
 
-            if self.game.drawPile != 0:
-                chosenSmt = False
-                while True:
-                    print(f"\n{current_player}, you have to draw {self.game.drawPile} cards, unless you can add to the stack :)")
-                    print("Type `uno play draw2` or `uno play draw4` to stack, or `uno accept` to draw.")
-                    print("Top Card: ", self.game.discardPile[-1])
-                    print("Your Hand: ", self.game.players[current_player])
-
-                    cmd = input("> ").strip().lower()
-                    if cmd == "uno accept":
-                        for _ in range(self.game.drawPile):
-                            self.game.drawCard(current_player)
-                        self.game.drawPile = 0
-                        self.game.pendingDrawType = None
-                        self.game.currentPlayer = (self.game.currentPlayer + self.game.direction) % len(self.game.players)
-                        break
-                    elif cmd.startswith("uno play"):
-                        if "draw4" or "wilddraw4" in cmd and self.game.pendingDrawType.lower() in ("draw2", "draw4"):
-                            card = ("wild", "draw4")
-                        elif "draw2" in cmd and self.game.pendingDrawType.lower() == "draw2":
-                            card = (self.game.currentColour, "draw2")
-                        else:
-                            print("Invalid, try again.")
-                            continue
-                        self.game.playCard(card, current_player)
-                        break
-                    elif cmd == "uno help":
-                        print("Only God can help you now")
-                        print("A draw 2 cannot be placed on a draw 4")
-                        print("A draw 4 can be placed on a draw 2 or a draw 4")
-                        print("If you have a draw 2 or draw 4 (as per validity), play it")
-                        print("Otherwise, type \x1B[3m" + "uno accept" + "\x1B[0m to accept your fate, and take all the cards.")
-                    elif cmd == "uno hand":
-                        print("Your Hand: ", self.game.players[current_player])
-
+            if self.game.drawPile:
+                print(f"\n{current_player}, you have to draw {self.game.drawPile} cards, unless you can add to the stack :)")
+                print("Type `uno play draw2` or `uno play draw4` to stack, or `uno accept` to draw.")
+                cmd = input("> ").strip().lower()
+                if cmd == "uno accept":
+                    for _ in range(self.game.drawPile):
+                        self.game.drawCard(current_player)
+                    self.game.drawPile = 0
+                    self.game.pendingDrawType = None
+                    self.game.currentPlayer = (self.game.currentPlayer + self.game.direction) % len(self.game.players)
+                elif cmd.startswith("uno play"):
+                    if "draw4" in cmd and self.game.pendingDrawType in ("Draw2", "draw4"):
+                        card = ("Wild", "draw4")
+                    elif "draw2" in cmd and self.game.pendingDrawType == "Draw2":
+                        card = (self.game.currentColour, "Draw2")
                     else:
-                        print("You must either accept or stack.")
-                continue # this continue is for the outer while
+                        print("Invalid stack—try again.")
+                        continue
+                    self.game.playCard(card, current_player)
+                else:
+                    print("You must either accept or stack.")
+                continue
 
             print(f"\n{current_player}'s turn")
             print("Top Card: ", self.game.discardPile[-1])
@@ -165,10 +144,9 @@ class UnoCLI:
 
             elif cmd == "uno top card":
                 print("Top Card: ", self.game.discardPile[-1])
-                print("Expected colour: ", self.game.currentColour)
 
             elif cmd == "uno help":
-                print("To see the top card, type \x1B[3m" + "uno top card" + "\x1B[0m. This will also give the expected colour in case of a wild.")
+                print("To see the top card, type \x1B[3m" + "uno top card" + "\x1B[0m.")
                 print("To see your hand, type \x1B[3m" + "uno hand" + "\x1B[0m.")
                 print("You are supposed to discard a card from your current hand, onto the discard pile.")
                 print("This card must either have the same colour or number as the top card")
@@ -196,11 +174,11 @@ class UnoCLI:
                 card = None
 
                 if "wild" in cardString.lower():
-                    wildColour = input("Choose colour (red/green/blue/yellow): ").capitalize()
+                    wildColour = input("Choose color (Red/Green/Blue/Yellow): ").capitalize()
                     if "draw4" in cardString.lower():
-                        card = ("wild", "draw4")
+                        card = ("Wild", "draw4")
                     else:
-                        card = ("wild", "wild")
+                        card = ("Wild", "Wild")
                 else:
                     for i in range(1, len(cardString)):
                         if cardString[i].isalpha() and cardString[i].isupper():
@@ -227,6 +205,7 @@ class UnoCLI:
                 print("To play a card, type \x1B[3m" + "uno play red7" + "\x1B[0m or \x1B[3m" + "uno play blueskip" + "\x1B[0m or \x1B[3m" + "uno play draw4" + "\x1B[0m, or similar.")
                 print("If you do not have a matching card, you must draw a card from the deck. Type \x1B[3m" + "uno draw" + "\x1B[0m.")
                 print("For help, type \x1B[3m" + "uno help" + "\x1B[0m.")
+                
 
 cli = UnoCLI(5)
 cli.gameStart()
