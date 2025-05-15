@@ -7,7 +7,7 @@ def buildDeck():
     colours = ["Red", "Green", "Blue", "Yellow"]
     numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     actions = ["Skip", "Reverse", "Draw2"] * 2   
-    wilds = ["Wild", "Wild", "Wild", "Wild", "draw4", "draw4", "draw4", "draw4"]
+    wilds = ["Wild", "Wild", "Wild", "Wild", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4", "draw4"]
     
     deck = []
     for colour in colours:
@@ -112,6 +112,8 @@ class UnoCLI:
             if self.game.drawPile:
                 print(f"\n{current_player}, you have to draw {self.game.drawPile} cards, unless you can add to the stack :)")
                 print("Type `uno play draw2` or `uno play draw4` to stack, or `uno accept` to draw.")
+                print("Top Card: ", self.game.discardPile[-1])
+                print("Your Hand: ", self.game.players[current_player])
                 cmd = input("> ").strip().lower()
                 if cmd == "uno accept":
                     for _ in range(self.game.drawPile):
