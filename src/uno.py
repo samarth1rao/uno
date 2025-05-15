@@ -144,9 +144,10 @@ class UnoCLI:
 
             elif cmd == "uno top card":
                 print("Top Card: ", self.game.discardPile[-1])
+                print("Expected Color: ", self.game.currentColour)
 
             elif cmd == "uno help":
-                print("To see the top card, type \x1B[3m" + "uno top card" + "\x1B[0m.")
+                print("To see the top card, type \x1B[3m" + "uno top card" + "\x1B[0m. Also tells expected colour")
                 print("To see your hand, type \x1B[3m" + "uno hand" + "\x1B[0m.")
                 print("You are supposed to discard a card from your current hand, onto the discard pile.")
                 print("This card must either have the same colour or number as the top card")
@@ -200,7 +201,7 @@ class UnoCLI:
             
             else:
                 print("Invalid command")
-                print("To see the top card, type \x1B[3m" + "uno top card" + "\x1B[0m.")
+                print("To see the top card, type \x1B[3m" + "uno top card" + "\x1B[0m. Also tells expected colour")
                 print("To see your hand, type \x1B[3m" + "uno hand" + "\x1B[0m.")
                 print("To play a card, type \x1B[3m" + "uno play red7" + "\x1B[0m or \x1B[3m" + "uno play blueskip" + "\x1B[0m or \x1B[3m" + "uno play draw4" + "\x1B[0m, or similar.")
                 print("If you do not have a matching card, you must draw a card from the deck. Type \x1B[3m" + "uno draw" + "\x1B[0m.")
